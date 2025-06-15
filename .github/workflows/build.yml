@@ -14,11 +14,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            artifact: myapp-linux.deb
+            artifact: MyApp.deb
           - os: windows-latest
-            artifact: myapp-windows-installer.exe
+            artifact: MyApp.exe
           - os: macos-latest
-            artifact: myapp-macos.dmg
+            artifact: MyApp.dmg
 
     steps:
     - uses: actions/checkout@v4
