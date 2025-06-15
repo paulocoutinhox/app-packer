@@ -11,6 +11,7 @@ help:
 	@echo "- build"
 	@echo "- build-complete"
 	@echo "- run"
+	@echo "- package"
 	@echo ""
 
 format:
@@ -32,6 +33,9 @@ build-complete:
 	rm -rf build
 	cmake -B build -DGENERATE_ICONS=ON .
 	cmake --build build
+
+package: build
+	cd build && cpack
 
 run:
 	./build/MyApp

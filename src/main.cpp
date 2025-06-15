@@ -1,64 +1,46 @@
-#include <iostream>
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+#include <GLFW/glfw3.h>
 
-#if defined(_WIN32)
+int main() {
+    if (!glfwInit()) return 1;
+    GLFWwindow* window = glfwCreateWindow(800, 600, "MyApp Demo", nullptr, nullptr);
+    glfwMakeContextCurrent(window);
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
-#include <windows.h>
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-    MessageBoxA(NULL, "Hello from MyApp!", "MyApp", MB_OK | MB_ICONINFORMATION);
-    return 0;
-}
+        ImGui::SetNextWindowPos(ImVec2(0,0));
+        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        ImGui::Begin("Centered Text", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        ImVec2 textSize = ImGui::CalcTextSize("Hello, MyApp!");
+        ImGui::SetCursorPos(ImVec2((windowSize.x - textSize.x) * 0.5f, (windowSize.y - textSize.y) * 0.5f));
+        ImGui::Text("Hello, MyApp!");
+        ImGui::End();
 
-#elif defined(__APPLE__)
-
-#include <TargetConditionals.h>
-#if TARGET_OS_MAC
-#include <ApplicationServices/ApplicationServices.h>
-
-int main(int argc, char *argv[])
-{
-    std::cout << "Hello from MyApp (macOS)!" << std::endl;
-    return 0;
-}
-#endif
-
-#else
-
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-
-int main(int argc, char *argv[])
-{
-    Display *display = XOpenDisplay(NULL);
-    if (!display)
-    {
-        std::cerr << "Cannot open display" << std::endl;
-        return 1;
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glfwSwapBuffers(window);
     }
 
-    int screen = DefaultScreen(display);
-    Window window = XCreateSimpleWindow(display, RootWindow(display, screen),
-                                        0, 0, 800, 600, 1,
-                                        BlackPixel(display, screen),
-                                        WhitePixel(display, screen));
-
-    XStoreName(display, window, "Empty Window");
-    XSelectInput(display, window, ExposureMask | KeyPressMask);
-    XMapWindow(display, window);
-
-    XEvent event;
-    while (1)
-    {
-        XNextEvent(display, &event);
-        if (event.type == KeyPress)
-        {
-            break;
-        }
-    }
-
-    XCloseDisplay(display);
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwDestroyWindow(window);
+    glfwTerminate();
     return 0;
 }
-
-#endif
